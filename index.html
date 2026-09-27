@@ -3,43 +3,138 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f6f3ee" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#1c1b19" media="(prefers-color-scheme: dark)">
-  <title>日記</title>
+  <meta name="theme-color" content="#f4f1ec" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1b1d21" media="(prefers-color-scheme: dark)">
+  <title>わたしの音声日記</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="app">
-    <section class="cal-pane">
-      <header class="cal-head">
-        <button id="prev" class="icon-btn" aria-label="前の月">‹</button>
-        <h1 id="month-label"></h1>
-        <button id="next" class="icon-btn" aria-label="次の月">›</button>
-        <button id="today" class="text-btn">今日</button>
-      </header>
-      <div class="weekdays">
-        <span class="sun">日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span class="sat">土</span>
-      </div>
-      <div id="grid" class="grid"></div>
-      <footer class="cal-foot">
-        <button id="export" class="text-btn">バックアップ保存</button>
-        <label class="text-btn">読み込み<input id="import" type="file" accept="application/json" hidden></label>
-      </footer>
-    </section>
+  <div class="shell">
+    <nav class="tabs" aria-label="メニュー">
+      <p class="brand">わたしの音声日記</p>
+      <button data-tab="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>ホーム</span></button>
+      <button data-tab="timeline"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>タイムライン</span></button>
+      <button data-tab="calendar"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>カレンダー</span></button>
+      <button data-tab="mypage"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>マイページ</span></button>
+    </nav>
 
-    <section class="edit-pane">
-      <header class="edit-head">
-        <button id="back" class="text-btn back">‹ カレンダー</button>
-        <h2 id="date-label"></h2>
-        <span id="status" class="status"></span>
-      </header>
-      <textarea id="text" placeholder="今日のこと…"></textarea>
-    </section>
-  </main>
+    <main>
+      <!-- ホーム -->
+      <section id="v-home" class="view">
+        <p id="home-date" class="home-date"></p>
+        <h1 class="ask">今日は<br>どんな日だった？</h1>
+        <div class="mic-wrap">
+          <button id="mic" class="mic" aria-label="録音する"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
+          <p class="hint">タップして録音</p>
+        </div>
+        <svg class="hills" viewBox="0 0 400 90" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 60 C60 30 110 35 160 52 S260 30 310 44 S380 50 400 40 V90 H0Z"/>
+          <path d="M0 72 C70 55 130 62 190 70 S300 56 400 64 V90 H0Z"/>
+        </svg>
+        <div class="cards">
+          <button id="home-entry" class="card entry-card"></button>
+          <div class="card">
+            <p class="card-label">今日の気分</p>
+            <div id="home-moods" class="moods"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- タイムライン -->
+      <section id="v-timeline" class="view">
+        <header class="view-head"><h2>タイムライン</h2></header>
+        <div id="tl-list" class="tl"></div>
+        <button id="tl-rec" class="fab">＋ 録音する</button>
+      </section>
+
+      <!-- カレンダー -->
+      <section id="v-calendar" class="view">
+        <header class="view-head cal-head">
+          <button id="prev" class="icon-btn" aria-label="前の月">‹</button>
+          <h2 id="month-label"></h2>
+          <button id="next" class="icon-btn" aria-label="次の月">›</button>
+        </header>
+        <div class="weekdays"><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span class="sat">土</span><span class="sun">日</span></div>
+        <div id="grid" class="grid"></div>
+        <div id="cal-detail" class="cal-detail"></div>
+        <div class="card mood-summary">
+          <p class="card-label">今月の気分</p>
+          <div class="donut-row"><svg id="donut" viewBox="0 0 42 42"></svg><ul id="mood-legend" class="legend"></ul></div>
+        </div>
+      </section>
+
+      <!-- マイページ -->
+      <section id="v-mypage" class="view">
+        <header class="profile">
+          <div class="avatar"></div>
+          <div><p class="profile-name">わたしの音声日記</p><p class="muted">声でつづる、わたしの時間。</p></div>
+        </header>
+        <div class="card list">
+          <p class="card-label">文字起こし（端末の中で処理）</p>
+          <label class="row">モデル
+            <select id="model-select"></select>
+          </label>
+          <div class="row"><span id="model-status" class="muted"></span><span class="row-actions"><button id="model-download" class="text-btn">ダウンロード</button><button id="model-remove" class="text-btn">削除</button></span></div>
+        </div>
+        <div class="card list">
+          <p class="card-label">バックアップ・復元</p>
+          <button id="export" class="row">バックアップを保存<span class="muted">本文・気分</span></button>
+          <label class="row">バックアップから読み込み<input id="import" type="file" accept="application/json" hidden><span class="muted">›</span></label>
+          <p class="note">※音声ファイルはまだバックアップに含まれません（同期機能で対応予定）。</p>
+        </div>
+        <div class="card list">
+          <p class="card-label">データ</p>
+          <div class="row">使用容量<span id="usage" class="muted"></span></div>
+          <div class="row">日記の数<span id="count" class="muted"></span></div>
+        </div>
+      </section>
+
+      <!-- 日記の詳細・編集 -->
+      <section id="v-entry" class="view">
+        <header class="view-head entry-head">
+          <button id="entry-back" class="icon-btn" aria-label="戻る">‹</button>
+          <h2 id="entry-date"></h2>
+          <button id="entry-delete" class="icon-btn" aria-label="この日の日記を削除"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+        </header>
+        <div id="entry-moods" class="moods"></div>
+        <div id="entry-clips" class="clips"></div>
+        <button id="entry-rec" class="text-btn add-rec">＋ この日に録音を追加</button>
+        <textarea id="text" placeholder="文字で書く…（キーボードのマイクでもOK）"></textarea>
+        <p id="status" class="status"></p>
+      </section>
+    </main>
+  </div>
+
+  <!-- 録音中 -->
+  <div id="rec" class="rec-overlay" hidden>
+    <p class="rec-label">録音中…</p>
+    <p id="rec-time" class="rec-time">00:00</p>
+    <canvas id="rec-wave" class="rec-wave" width="600" height="160"></canvas>
+    <p class="rec-hint">話してください…</p>
+    <div class="rec-actions">
+      <button id="rec-cancel" class="rec-cancel" aria-label="キャンセル">✕<span>キャンセル</span></button>
+      <button id="rec-stop" class="rec-stop" aria-label="録音を終える"><i></i></button>
+      <span class="rec-spacer"></span>
+    </div>
+  </div>
+
+  <!-- 録音後 -->
+  <div id="review" class="review" hidden>
+    <div class="review-inner">
+      <button id="review-close" class="icon-btn review-close" aria-label="閉じる">✕</button>
+      <div class="done-mark">✓</div>
+      <p class="review-title">録音が完了しました</p>
+      <p id="review-dur" class="muted center"></p>
+      <div class="player" id="review-player"></div>
+      <p class="card-label">文字起こし <span id="tr-status" class="muted"></span></p>
+      <textarea id="review-text" placeholder="文字起こしの結果がここに入ります。自分で書いても大丈夫です。"></textarea>
+      <button id="review-save" class="primary-btn wide">保存する</button>
+    </div>
+  </div>
 
   <dialog id="import-dialog">
     <form method="dialog">
@@ -55,6 +150,8 @@
   </dialog>
 
   <script src="store.js"></script>
+  <script src="recorder.js"></script>
+  <script src="transcribe.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
