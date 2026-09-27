@@ -1,0 +1,109 @@
+:root {
+  --bg: #f6f3ee;
+  --panel: #fffdf9;
+  --text: #2b2926;
+  --muted: #8a847b;
+  --line: #e4ded4;
+  --accent: #c0673e;
+  --sun: #c4473a;
+  --sat: #3a6fc4;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1b19;
+    --panel: #252421;
+    --text: #e8e4dc;
+    --muted: #8f897f;
+    --line: #37352f;
+    --accent: #e08a5e;
+    --sun: #e0766a;
+    --sat: #7fa3e0;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+label.text-btn { cursor: pointer; }
+
+.app {
+  height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(320px, 420px) 1fr;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* カレンダー */
+.cal-pane { padding: 20px 16px; border-right: 1px solid var(--line); overflow-y: auto; }
+.cal-head { display: flex; align-items: center; gap: 4px; margin-bottom: 12px; }
+.cal-head h1 { font-size: 1.15rem; font-weight: 600; margin: 0 4px; min-width: 7.5em; text-align: center; }
+.icon-btn { font-size: 1.5rem; width: 40px; height: 40px; border-radius: 50%; }
+.icon-btn:hover, .text-btn:hover { background: var(--line); }
+.text-btn { padding: 6px 12px; border-radius: 8px; font-size: .9rem; color: var(--muted); }
+#today { margin-left: auto; }
+
+.weekdays, .grid { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; }
+.weekdays { font-size: .8rem; color: var(--muted); margin-bottom: 4px; }
+.sun { color: var(--sun); }
+.sat { color: var(--sat); }
+.grid { gap: 2px; }
+.day {
+  aspect-ratio: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  border-radius: 10px;
+  font-size: .95rem;
+}
+.day:hover { background: var(--line); }
+.day.empty { visibility: hidden; }
+.day.today { font-weight: 700; color: var(--accent); }
+.day.selected { background: var(--panel); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.day::after { content: ""; width: 5px; height: 5px; border-radius: 50%; }
+.day.has-entry::after { background: var(--accent); }
+
+.cal-foot { display: flex; justify-content: center; gap: 8px; margin-top: 20px; }
+
+/* 日記 */
+.edit-pane { display: flex; flex-direction: column; background: var(--panel); min-height: 0; }
+.edit-head { display: flex; align-items: center; gap: 12px; padding: 20px 24px 8px; }
+.edit-head h2 { font-size: 1.05rem; font-weight: 600; margin: 0; }
+.status { margin-left: auto; font-size: .8rem; color: var(--muted); }
+.back { display: none; }
+#text {
+  flex: 1;
+  width: 100%;
+  padding: 8px 24px 40px;
+  border: 0; outline: none; resize: none;
+  background: transparent; color: var(--text);
+  font: inherit; font-size: 1.05rem; line-height: 1.9;
+}
+
+/* インポート確認 */
+dialog {
+  border: 1px solid var(--line); border-radius: 14px;
+  background: var(--panel); color: var(--text);
+  max-width: min(420px, calc(100vw - 32px)); padding: 20px 20px 12px;
+}
+dialog::backdrop { background: rgb(0 0 0 / .35); }
+dialog h3 { margin: 0 0 8px; font-size: 1rem; }
+dialog .note { font-size: .82rem; color: var(--muted); line-height: 1.6; }
+.dlg-actions { display: flex; justify-content: flex-end; gap: 4px; margin-top: 12px; }
+.primary-btn { padding: 6px 16px; border-radius: 8px; font-size: .9rem; background: var(--accent); color: #fff; }
+
+/* スマホ：1画面ずつ切り替え */
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; }
+  .cal-pane { border-right: 0; }
+  .edit-pane { display: none; }
+  body.editing .cal-pane { display: none; }
+  body.editing .edit-pane { display: flex; }
+  .back { display: inline-block; margin-left: -12px; }
+  .edit-head { padding: 12px 16px 4px; flex-wrap: wrap; }
+  .edit-head h2 { width: 100%; order: 3; }
+  #text { padding: 8px 16px 40px; font-size: 16px; } /* 16px未満だとiOSで入力時に拡大される */
+}
